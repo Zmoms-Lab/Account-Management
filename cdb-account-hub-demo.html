@@ -1,0 +1,566 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CĐB Account Hub — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#ED217C; --brand-dark:#C4145F; --brand-tint:#FDECF4; --brand-tint2:#FBD9E9;
+  --ink:#1E1622; --muted:#7A7280; --bg:#F6F4F8; --surface:#FFFFFF; --border:#ECE6F0;
+  --ok:#1F9D6B; --warn:#E0912F; --info:#2E86C1; --lost:#B0AAB6;
+  --shadow:0 1px 2px rgba(30,22,34,.04), 0 6px 24px rgba(30,22,34,.05);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+a{color:inherit}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#dcd6e2;border-radius:20px;border:3px solid var(--bg)}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:248px 1fr;height:100vh}
+.sidebar{background:linear-gradient(180deg,#2A1520 0%, #1E1622 100%);color:#fff;display:flex;flex-direction:column;padding:18px 14px;gap:6px;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:11px;padding:6px 8px 16px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px}
+.brand img{width:40px;height:40px;border-radius:11px;background:#fff;padding:3px}
+.brand b{font-size:15px;font-weight:800;letter-spacing:.2px;line-height:1.1}
+.brand span{display:block;font-size:10.5px;color:#c9a9bb;font-weight:500;letter-spacing:1.5px;text-transform:uppercase}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;color:#8b7d87;padding:12px 10px 4px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;color:#d9d2df;font-weight:500;font-size:13.5px;border:0;background:none;width:100%;text-align:left;transition:.15s}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item.active{background:var(--brand);color:#fff;box-shadow:0 4px 14px rgba(237,33,124,.45)}
+.nav-item .ic{width:18px;text-align:center;font-size:15px;opacity:.95}
+.nav-item .badge{margin-left:auto;background:rgba(255,255,255,.16);font-size:11px;padding:1px 7px;border-radius:20px;font-weight:600}
+.nav-item.active .badge{background:rgba(255,255,255,.25)}
+
+.main{overflow-y:auto;height:100vh}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(246,244,248,.85);backdrop-filter:blur(8px);display:flex;align-items:center;gap:16px;padding:16px 28px;border-bottom:1px solid var(--border)}
+.search{flex:1;max-width:440px;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:9px 13px;color:var(--muted)}
+.search input{border:0;outline:0;flex:1;font-family:inherit;font-size:13.5px;color:var(--ink);background:none}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px}
+.who .av{width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+.who small{color:var(--muted);display:block;font-size:11.5px}
+.content{padding:26px 28px 60px}
+
+/* ---------- headers ---------- */
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap}
+.page-head h1{margin:0;font-size:23px;font-weight:800;letter-spacing:-.3px}
+.page-head p{margin:3px 0 0;color:var(--muted);font-size:13.5px}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink);padding:9px 15px;border-radius:10px;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{border-color:#dccfd7}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-dark);border-color:var(--brand-dark)}
+
+/* ---------- cards ---------- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.grid{display:grid;gap:16px}
+
+/* stat cards */
+.stats{grid-template-columns:repeat(4,1fr)}
+.stat{padding:18px 18px 16px;position:relative;overflow:hidden}
+.stat .lab{color:var(--muted);font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:8px}
+.stat .lab .dot{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:var(--brand-tint);color:var(--brand)}
+.stat .num{font-size:30px;font-weight:800;margin-top:10px;letter-spacing:-1px}
+.stat .sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.stat.accent{background:linear-gradient(135deg,var(--brand),#F0568F);color:#fff;border:0}
+.stat.accent .lab,.stat.accent .sub{color:rgba(255,255,255,.9)}
+.stat.accent .lab .dot{background:rgba(255,255,255,.2);color:#fff}
+
+/* charts */
+.charts{grid-template-columns:1.4fr 1fr}
+.chart-card{padding:18px 20px}
+.chart-card h3{margin:0 0 14px;font-size:14.5px;font-weight:700}
+.bar-row{display:flex;align-items:center;gap:12px;margin:9px 0;font-size:12.5px}
+.bar-row .nm{width:98px;color:var(--muted);flex-shrink:0}
+.bar-track{flex:1;background:var(--bg);border-radius:20px;height:16px;overflow:hidden}
+.bar-fill{height:100%;border-radius:20px;background:var(--brand);transition:width .8s cubic-bezier(.2,.7,.3,1)}
+.bar-row .val{width:26px;text-align:right;font-weight:700;font-size:12px}
+.donut-wrap{display:flex;align-items:center;gap:18px}
+.legend{font-size:12px;display:flex;flex-direction:column;gap:7px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:7px}
+
+/* filter bar */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:center}
+.filters select,.filters .fsearch{border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:9px 12px;font-family:inherit;font-size:13px;color:var(--ink);outline:0}
+.filters select:focus,.filters .fsearch:focus{border-color:var(--brand)}
+.filters .fsearch{min-width:200px}
+.chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.count-note{margin-left:auto;color:var(--muted);font-size:12.5px}
+
+/* project cards */
+.proj-grid{grid-template-columns:repeat(3,1fr)}
+.proj{overflow:hidden;cursor:pointer;transition:.18s;display:flex;flex-direction:column}
+.proj:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(30,22,34,.1);border-color:var(--brand-tint2)}
+.proj .cover{height:112px;background:var(--brand-tint);position:relative;display:grid;place-items:center;font-size:34px;color:var(--brand)}
+.proj .body{padding:14px 15px 15px;flex:1;display:flex;flex-direction:column;gap:8px}
+.proj .body h4{margin:0;font-size:14.5px;font-weight:700;line-height:1.3}
+.proj .meta{color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:auto}
+.proj .meta b{color:var(--ink);font-weight:600}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:13px}
+.tbl-wrap{overflow:hidden}
+thead th{text-align:left;padding:12px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:#faf8fb;position:sticky;top:0}
+tbody td{padding:12px 16px;border-bottom:1px solid var(--border)}
+tbody tr{transition:.12s}
+tbody tr:hover{background:var(--brand-tint)}
+tbody tr:last-child td{border-bottom:0}
+.hosp-name{font-weight:600}
+.mini{color:var(--muted);font-size:11.5px}
+
+/* progress */
+.prog-track{background:var(--bg);border-radius:20px;height:8px;overflow:hidden;width:120px;display:inline-block;vertical-align:middle}
+.prog-fill{height:100%;background:var(--brand);border-radius:20px}
+
+/* kanban */
+.kanban{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;align-items:start}
+.kcol{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px;min-height:120px}
+.kcol h4{margin:2px 4px 10px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.kcol h4 span{background:var(--bg);color:var(--muted);border-radius:20px;font-size:11px;padding:1px 8px}
+.kcard{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:9px;cursor:grab}
+.kcard:hover{border-color:var(--brand-tint2)}
+.kcard b{font-size:12.5px;display:block;line-height:1.35}
+.kcard .kb-meta{font-size:11px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between}
+
+/* file cards */
+.file-grid{grid-template-columns:repeat(3,1fr)}
+.file{padding:15px;display:flex;gap:13px;align-items:flex-start}
+.file .fic{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:18px;color:#fff;flex-shrink:0;font-weight:700}
+.file h4{margin:0 0 3px;font-size:13.5px;font-weight:700;line-height:1.3}
+.file .fmeta{font-size:11.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 9px;margin-top:5px}
+.file .dl{margin-top:9px;font-size:12px;color:var(--brand);font-weight:600;background:none;border:0;padding:0;display:inline-flex;gap:5px}
+
+/* wiki */
+.wiki{grid-template-columns:200px 1fr;align-items:start;gap:20px}
+.wiki-nav{position:sticky;top:90px}
+.wiki-nav button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 12px;border-radius:9px;color:var(--muted);font-weight:500;font-size:13px}
+.wiki-nav button.active{background:var(--brand-tint);color:var(--brand);font-weight:700}
+.wiki-body{padding:24px 28px}
+.wiki-body h2{margin:0 0 6px;font-size:18px}
+.wiki-body h3{font-size:14px;margin:20px 0 8px}
+.wiki-body p{color:#4a434f;margin:0 0 10px}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.flow .step{background:var(--brand-tint);color:var(--brand-dark);font-weight:600;padding:7px 13px;border-radius:9px;font-size:12.5px}
+.flow .arr{color:var(--muted)}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(30,22,34,.5);backdrop-filter:blur(3px);z-index:50;display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+.overlay.on{display:flex}
+.modal{background:var(--surface);border-radius:18px;max-width:820px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden;animation:pop .25s ease}
+@keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal-head{background:linear-gradient(135deg,var(--brand),#F0568F);color:#fff;padding:22px 26px;position:relative}
+.modal-head h2{margin:0;font-size:20px;font-weight:800}
+.modal-head .mh-meta{margin-top:6px;font-size:13px;opacity:.92;display:flex;flex-wrap:wrap;gap:6px 14px}
+.modal-close{position:absolute;top:16px;right:18px;background:rgba(255,255,255,.2);border:0;color:#fff;width:32px;height:32px;border-radius:9px;font-size:16px}
+.modal-close:hover{background:rgba(255,255,255,.32)}
+.modal-body{padding:24px 26px;display:grid;grid-template-columns:1.6fr 1fr;gap:24px}
+.mb-section h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.mb-section p{margin:0 0 16px;font-size:13.5px;color:#3a343f}
+.mtimeline{list-style:none;padding:0;margin:0 0 16px}
+.mtimeline li{position:relative;padding:0 0 14px 22px;font-size:13px}
+.mtimeline li:before{content:'';position:absolute;left:5px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--brand)}
+.mtimeline li:after{content:'';position:absolute;left:9px;top:12px;bottom:0;width:2px;background:var(--brand-tint2)}
+.mtimeline li:last-child:after{display:none}
+.mgallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mgallery div{aspect-ratio:1;border-radius:9px;background:var(--brand-tint);display:grid;place-items:center;color:var(--brand);font-size:20px}
+.side-box{background:var(--bg);border-radius:12px;padding:15px}
+.kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.kv:last-child{border:0}
+.kv span{color:var(--muted)}
+.kv b{font-weight:700}
+.dl-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.dl-btn{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:12.5px;font-weight:600;color:var(--ink)}
+.dl-btn:hover{border-color:var(--brand);color:var(--brand)}
+
+.hidden{display:none!important}
+.demo-tag{position:fixed;bottom:16px;right:18px;background:var(--ink);color:#fff;font-size:11px;font-weight:600;padding:7px 13px;border-radius:20px;z-index:40;opacity:.9}
+
+@media(max-width:1100px){.charts,.modal-body,.wiki{grid-template-columns:1fr}.proj-grid,.file-grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.kanban{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.app{grid-template-columns:1fr}.sidebar{display:none}.proj-grid,.file-grid,.stats{grid-template-columns:1fr}}
+</style>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="data:image/png;base64,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" alt="CĐB">
+      <div><b>Account Hub</b><span>Cộng Đồng Bầu</span></div>
+    </div>
+    <div class="nav-label">Tổng quan</div>
+    <nav id="nav"></nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="search">🔍 <input placeholder="Tìm dự án, bệnh viện, HCP, tài liệu…" oninput="globalSearch(this.value)"></div>
+      <div class="who">
+        <div style="text-align:right"><b style="font-size:13px">Minh Anh</b><small>Account Lead</small></div>
+        <div class="av">MA</div>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div>
+<div class="demo-tag">● Bản demo · dữ liệu mẫu</div>
+
+<script>
+/* ---------------- lookups ---------------- */
+const BRAND_COLOR={Johnson:'#D81E5B',Molfix:'#2E9BD6',Comfort:'#1F8A70',Anlene:'#6C4AB6','Sure Prevent':'#E5851A','Happy Event':'#C0392B',Lifebuoy:'#2874A6'};
+const brands=Object.keys(BRAND_COLOR);
+const regions=['HCM','Hà Nội','Miền Bắc','Miền Trung','Miền Nam'];
+const activities=['Event','Hội thảo','Sampling','Prenatal class','Booth','Recruitment','Activation'];
+const STATUS_COLOR={'Chưa gửi':'--lost','Đã gửi':'--info','Follow up':'--warn','Đàm phán':'--brand','Won':'--ok','Lost':'--lost'};
+
+function bchip(b){return `<span class="chip" style="background:${BRAND_COLOR[b]}1a;color:${BRAND_COLOR[b]}">${b}</span>`}
+
+/* ---------------- sample data ---------------- */
+const projects=[
+ {id:1,name:'Johnson Baby Care Day 2025',brand:'Johnson',client:'Kenvue / Ogilvy',prod:'Sữa tắm & dầu Johnson Baby',act:['Event','Sampling'],region:'HCM',year:2025,time:'03/2025 – 05/2025',cpr:'18.500đ',kpi:'12.000 mẹ tiếp cận',result:'14.320 mẹ · vượt 119% KPI',hosp:['BV Từ Dũ','BV Hùng Vương','BV Mỹ Đức'],note:'Client hài lòng, đã ký tiếp Q3.',tl:['Brief & chốt concept (03/2025)','Setup booth 5 bệnh viện (04/2025)','Triển khai sampling + mini event (04–05/2025)','Nghiệm thu & báo cáo (05/2025)']},
+ {id:2,name:'Molfix Diaper Sampling HCM',brand:'Molfix',client:'Hayat / Dentsu',prod:'Tã Molfix size M-L',act:['Sampling','Booth'],region:'HCM',year:2025,time:'02/2025 – 04/2025',cpr:'9.200đ',kpi:'20.000 sample',result:'21.800 sample · 108%',hosp:['BV Từ Dũ','BV Nhi Đồng 1'],note:'Lấy data masterplan HCM từ file Glico + Molfix.',tl:['Chốt danh sách BV (02/2025)','In ấn & logistics (02/2025)','Sampling tại BV (03–04/2025)','Báo cáo (04/2025)']},
+ {id:3,name:'Anlene Bone Health Talk',brand:'Anlene',client:'Fonterra',prod:'Anlene Gold 5X',act:['Hội thảo','Booth'],region:'Hà Nội',year:2025,time:'05/2025 – 06/2025',cpr:'27.000đ',kpi:'8 hội thảo · 1.600 khách',result:'8 buổi · 1.740 khách',hosp:['BV Lão khoa TW','BV Bạch Mai'],note:'HCP: BS. Nguyễn Văn Hùng chủ trì.',tl:['Mời HCP & chốt lịch (05/2025)','Truyền thông nội bộ BV (05/2025)','Tổ chức hội thảo (05–06/2025)','Nghiệm thu (06/2025)']},
+ {id:4,name:'Comfort Prenatal Class Series',brand:'Comfort',client:'Unilever',prod:'Comfort Elegant',act:['Prenatal class'],region:'HCM',year:2025,time:'04/2025 – 07/2025',cpr:'22.400đ',kpi:'24 lớp · 900 mẹ bầu',result:'24 lớp · 968 mẹ bầu',hosp:['BV Từ Dũ','BV Hùng Vương','BV Mỹ Đức'],note:'',tl:['Xây giáo án lớp (04/2025)','Chốt HCP giảng (04/2025)','Chạy 24 lớp (05–07/2025)','Báo cáo tổng (07/2025)']},
+ {id:5,name:'Lifebuoy Handwash Roadshow',brand:'Lifebuoy',client:'Unilever',prod:'Lifebuoy Foam',act:['Activation','Booth'],region:'Miền Nam',year:2025,time:'06/2025 – 08/2025',cpr:'14.100đ',kpi:'15 điểm · 30.000 lượt',result:'15 điểm · 33.500 lượt',hosp:['BV Nhi Đồng Cần Thơ','BV Sản Nhi Cà Mau'],note:'',tl:['Khảo sát điểm (06/2025)','Setup roadshow (06/2025)','Triển khai (07–08/2025)','Nghiệm thu (08/2025)']},
+ {id:6,name:'Sure Prevent Senior Screening',brand:'Sure Prevent',client:'Abbott',prod:'Ensure Sure Prevent',act:['Event','Hội thảo'],region:'Hà Nội',year:2025,time:'03/2025 – 05/2025',cpr:'31.500đ',kpi:'6 buổi · 1.200 NCT',result:'6 buổi · 1.280 NCT',hosp:['BV Lão khoa TW'],note:'Gói Người cao tuổi (NCT).',tl:['Chốt concept NCT (03/2025)','Mời HCP (03/2025)','Tổ chức screening (04–05/2025)','Báo cáo (05/2025)']},
+ {id:7,name:'Happy Event Baby Fair',brand:'Happy Event',client:'Agency A',prod:'Combo mẹ & bé',act:['Event','Recruitment'],region:'HCM',year:2025,time:'09/2025 – 10/2025',cpr:'16.800đ',kpi:'1 fair · 5.000 khách',result:'5.600 khách',hosp:['BV Mỹ Đức'],note:'',tl:['Concept fair (09/2025)','Recruit mẹ tham gia (09/2025)','Tổ chức fair (10/2025)','Nghiệm thu (10/2025)']},
+ {id:8,name:'Molfix Booth Miền Trung',brand:'Molfix',client:'Hayat',prod:'Tã Molfix',act:['Booth','Sampling'],region:'Miền Trung',year:2025,time:'08/2025 – 09/2025',cpr:'10.400đ',kpi:'8 BV · 12.000 sample',result:'8 BV · 12.900 sample',hosp:['BV Phụ Sản Đà Nẵng'],note:'',tl:['Chốt BV Miền Trung (08/2025)','Logistics (08/2025)','Booth + sampling (08–09/2025)','Báo cáo (09/2025)']},
+ {id:9,name:'Johnson 1000 Ngày Vàng',brand:'Johnson',client:'Kenvue',prod:'Johnson Baby line',act:['Prenatal class','Hội thảo'],region:'HCM',year:2025,time:'10/2025 – 12/2025',cpr:'20.900đ',kpi:'18 lớp · 720 mẹ',result:'18 lớp · 795 mẹ',hosp:['BV Từ Dũ','BV Hùng Vương'],note:'Đề xuất gói community mở rộng 2026.',tl:['Xây nội dung 1000 ngày (10/2025)','Chốt HCP (10/2025)','Chạy lớp (11–12/2025)','Tổng kết (12/2025)']},
+];
+const ongoing=[
+ {id:11,name:'Anlene Community 2026',brand:'Anlene',owner:'Minh Anh',phase:'Triển khai hội thảo',pct:62,confirm:['BV Lão khoa TW','BV Bạch Mai'],pending:['BV Hữu Nghị'],kpi:'10 buổi · 2.000 NCT',issue:'BV Hữu Nghị chậm phản hồi lịch.',follow:'Gọi lại đầu mối BV Hữu Nghị trong tuần.',deadline:'20/07/2026'},
+ {id:12,name:'Molfix Sampling Q3',brand:'Molfix',owner:'Trọng Nhân',phase:'Chuẩn bị logistics',pct:35,confirm:['BV Từ Dũ'],pending:['BV Hùng Vương','BV Nhi Đồng 1'],kpi:'25.000 sample',issue:'Chờ duyệt số lượng sample từ client.',follow:'Follow up PO với Hayat.',deadline:'12/07/2026'},
+ {id:13,name:'Comfort Prenatal HN',brand:'Comfort',owner:'Minh Anh',phase:'Chạy lớp',pct:78,confirm:['BV Phụ Sản HN'],pending:[],kpi:'12 lớp · 480 mẹ',issue:'—',follow:'Chuẩn bị nghiệm thu đợt 1.',deadline:'15/07/2026'},
+ {id:14,name:'Lifebuoy School Activation',brand:'Lifebuoy',owner:'Thu Hà',phase:'Khảo sát điểm',pct:20,confirm:[],pending:['BV Nhi Đồng 2'],kpi:'20 điểm · 40.000 lượt',issue:'Đang chờ danh sách trường từ client.',follow:'Xin brief chi tiết.',deadline:'25/07/2026'},
+];
+const pipeline=[
+ {name:'Event 1.000 ngày vàng',brand:'Anlene',status:'Đàm phán',owner:'Minh Anh',sent:'20/06/2026',dl:'10/07/2026',insight:'Mẹ bầu quan tâm dinh dưỡng 1000 ngày đầu.'},
+ {name:'Hospital Activation Combo',brand:'Molfix',status:'Follow up',owner:'Trọng Nhân',sent:'25/06/2026',dl:'08/07/2026',insight:'Booth + sampling gói bệnh viện tiết kiệm 20%.'},
+ {name:'Prenatal Class Package',brand:'Comfort',status:'Đã gửi',owner:'Minh Anh',sent:'01/07/2026',dl:'14/07/2026',insight:'Lớp tiền sản có tỉ lệ convert cao.'},
+ {name:'HCP Booking Series',brand:'Sure Prevent',status:'Won',owner:'Thu Hà',sent:'10/06/2026',dl:'—',insight:'KOL bác sĩ tăng uy tín NCT.'},
+ {name:'Sampling BV Miền Trung',brand:'Johnson',status:'Chưa gửi',owner:'Trọng Nhân',sent:'—',dl:'18/07/2026',insight:'Mở rộng traffic Đà Nẵng, Huế.'},
+ {name:'KOL/KOC Mẹ Bé',brand:'Happy Event',status:'Lost',owner:'Thu Hà',sent:'02/06/2026',dl:'—',insight:'Budget client chưa sẵn sàng năm nay.'},
+];
+const hospitals=[
+ {name:'BV Từ Dũ',region:'HCM',acts:['Event','Sampling','Prenatal class','Booth'],traffic:2800,moms:1400,kids:900,brands:['Johnson','Molfix','Comfort'],status:'Đang hợp tác',contact:'CN. Lê Thị Hoa'},
+ {name:'BV Hùng Vương',region:'HCM',acts:['Sampling','Prenatal class','Booth'],traffic:2400,moms:1200,kids:700,brands:['Johnson','Comfort'],status:'Đang hợp tác',contact:'CN. Trần Văn Nam'},
+ {name:'BV Mỹ Đức',region:'HCM',acts:['Event','Prenatal class','Recruitment'],traffic:1600,moms:900,kids:500,brands:['Johnson','Happy Event'],status:'Đang hợp tác',contact:'BS. Phạm Thu'},
+ {name:'BV Nhi Đồng 1',region:'HCM',acts:['Sampling','Booth','Activation'],traffic:3200,moms:200,kids:2600,brands:['Molfix'],status:'Tiềm năng',contact:'CN. Ngô Hải'},
+ {name:'BV Bạch Mai',region:'Hà Nội',acts:['Hội thảo','Event'],traffic:4000,moms:600,kids:400,brands:['Anlene'],status:'Đang hợp tác',contact:'BS. Nguyễn Hùng'},
+ {name:'BV Lão khoa TW',region:'Hà Nội',acts:['Hội thảo','Event'],traffic:1800,moms:0,kids:0,brands:['Anlene','Sure Prevent'],status:'Đang hợp tác',contact:'BS. Đỗ Minh'},
+ {name:'BV Phụ Sản Đà Nẵng',region:'Miền Trung',acts:['Booth','Sampling','Prenatal class'],traffic:1500,moms:800,kids:450,brands:['Molfix'],status:'Đang hợp tác',contact:'CN. Võ Lan'},
+ {name:'BV Nhi Đồng Cần Thơ',region:'Miền Nam',acts:['Activation','Booth'],traffic:2100,moms:300,kids:1500,brands:['Lifebuoy'],status:'Tiềm năng',contact:'CN. Huỳnh Phúc'},
+];
+const hcps=[
+ {name:'BS. Nguyễn Văn Hùng',spec:'Lão khoa',work:'BV Lão khoa TW',region:'Hà Nội',topics:'Dinh dưỡng NCT, loãng xương',fmt:['Offline','Livestream'],cost:'15.000.000đ',rate:5},
+ {name:'BS. Trần Thị Mai',spec:'Sản phụ khoa',work:'BV Từ Dũ',region:'HCM',topics:'Thai kỳ, dinh dưỡng mẹ bầu',fmt:['Offline','Online','Workshop'],cost:'12.000.000đ',rate:5},
+ {name:'BS. Lê Quốc Anh',spec:'Nhi khoa',work:'BV Nhi Đồng 1',region:'HCM',topics:'Chăm sóc trẻ sơ sinh',fmt:['Offline','Video'],cost:'10.000.000đ',rate:4},
+ {name:'ThS. Phạm Hồng',spec:'Dinh dưỡng',work:'BV Bạch Mai',region:'Hà Nội',topics:'Dinh dưỡng 1000 ngày vàng',fmt:['Online','Livestream','Workshop'],cost:'8.000.000đ',rate:4},
+ {name:'BS. Võ Thanh Tú',spec:'Sản phụ khoa',work:'BV Phụ Sản Đà Nẵng',region:'Miền Trung',topics:'Lớp tiền sản',fmt:['Offline','Workshop'],cost:'7.000.000đ',rate:4},
+ {name:'BS. Đặng Kim',spec:'Nhi khoa',work:'BV Nhi Đồng Cần Thơ',region:'Miền Nam',topics:'Vệ sinh & phòng bệnh cho trẻ',fmt:['Offline','Video'],cost:'6.500.000đ',rate:3},
+];
+const docs={
+ templates:[
+  {n:'Form báo giá chuẩn',t:'XLSX',v:'v2.1',d:'02/07/2026',c:'#1F9D6B'},
+  {n:'Hợp đồng khung - Event',t:'DOCX',v:'v1.4',d:'28/06/2026',c:'#2E86C1'},
+  {n:'Hợp đồng khung - Sampling',t:'DOCX',v:'v1.2',d:'28/06/2026',c:'#2E86C1'},
+  {n:'Hợp đồng khung - HCP Booking',t:'DOCX',v:'v1.0',d:'15/06/2026',c:'#2E86C1'},
+  {n:'Form báo cáo tuần',t:'XLSX',v:'v3.0',d:'01/07/2026',c:'#1F9D6B'},
+  {n:'Form masterplan',t:'XLSX',v:'v2.0',d:'20/06/2026',c:'#1F9D6B'},
+  {n:'Form nghiệm thu',t:'PDF',v:'v1.1',d:'10/06/2026',c:'#C0392B'},
+  {n:'Form timeline triển khai',t:'XLSX',v:'v1.3',d:'22/06/2026',c:'#1F9D6B'},
+ ],
+ credentials:[
+  {n:'Credential Cộng Đồng Bầu (VI)',t:'PDF',v:'2026',d:'01/07/2026',c:'#ED217C',cat:'Cộng Đồng Bầu · VI'},
+  {n:'Credential Cộng Đồng Bầu (EN)',t:'PDF',v:'2026',d:'01/07/2026',c:'#ED217C',cat:'Cộng Đồng Bầu · EN'},
+  {n:'Product Deck OTB (VI)',t:'PPTX',v:'2026',d:'25/06/2026',c:'#E5851A',cat:'OTB · VI'},
+  {n:'Product Deck IPD8 (EN)',t:'PPTX',v:'2026',d:'25/06/2026',c:'#6C4AB6',cat:'IPD8 · EN'},
+  {n:'Credential Zmoms (VI)',t:'PDF',v:'2026',d:'18/06/2026',c:'#2E9BD6',cat:'Zmoms · VI'},
+  {n:'Product Deck NCT (VI)',t:'PPTX',v:'2026',d:'12/06/2026',c:'#1F8A70',cat:'NCT · VI'},
+ ],
+ proposals:[
+  {n:'Event 1.000 ngày vàng',t:'PPTX',v:'v3',d:'20/06/2026',c:'#ED217C',cat:'Đang dùng'},
+  {n:'Người cao tuổi (NCT)',t:'PPTX',v:'v2',d:'15/06/2026',c:'#E5851A',cat:'Đang dùng'},
+  {n:'Hospital Activation',t:'PPTX',v:'v2',d:'10/06/2026',c:'#2E86C1',cat:'Đang dùng'},
+  {n:'Prenatal Class',t:'PPTX',v:'v1',d:'05/06/2026',c:'#1F8A70',cat:'Đang dùng'},
+  {n:'Sampling tại bệnh viện',t:'PPTX',v:'v2',d:'01/06/2026',c:'#6C4AB6',cat:'Đang dùng'},
+  {n:'Community / KOL-KOC Mẹ bé',t:'PPTX',v:'v1',d:'28/05/2026',c:'#C0392B',cat:'Nháp'},
+ ],
+};
+
+/* ---------------- nav ---------------- */
+const NAV=[
+ {id:'dashboard',ic:'▦',label:'Dashboard'},
+ {id:'projects',ic:'📁',label:'Dự án đã làm',badge:projects.length},
+ {id:'ongoing',ic:'⚙',label:'Đang triển khai',badge:ongoing.length},
+ {id:'pipeline',ic:'📨',label:'Đang mời nhãn hàng',badge:pipeline.length},
+ {id:'hospitals',ic:'🏥',label:'Bệnh viện',badge:hospitals.length},
+ {id:'hcp',ic:'👤',label:'HCP Booking',badge:hcps.length},
+ {id:'templates',ic:'📄',label:'Template & biểu mẫu'},
+ {id:'credentials',ic:'📊',label:'Credential & Deck'},
+ {id:'proposals',ic:'💡',label:'Proposal thư viện'},
+ {id:'structure',ic:'🧩',label:'Structure & Quy trình'},
+];
+let current='dashboard';
+function buildNav(){
+ document.getElementById('nav').innerHTML=NAV.map(n=>
+  `<button class="nav-item ${n.id===current?'active':''}" onclick="go('${n.id}')"><span class="ic">${n.ic}</span>${n.label}${n.badge?`<span class="badge">${n.badge}</span>`:''}</button>`
+ ).join('');
+}
+function go(id){current=id;buildNav();render();document.querySelector('.main').scrollTop=0;}
+
+/* ---------------- helpers ---------------- */
+function opts(arr){return ['<option value="">Tất cả</option>'].concat(arr.map(a=>`<option>${a}</option>`)).join('')}
+function statusChip(s){const c=STATUS_COLOR[s]||'--muted';return `<span class="chip" style="background:var(${c});color:#fff">${s}</span>`}
+function coopChip(s){const c=s==='Đang hợp tác'?'--ok':s==='Tiềm năng'?'--warn':'--lost';return `<span class="chip" style="background:var(${c})1a;color:var(${c})">${s}</span>`}
+function stars(n){return '★'.repeat(n)+'<span style="color:#ddd">'+'★'.repeat(5-n)+'</span>'}
+
+/* ---------------- render router ---------------- */
+function render(){
+ const R={dashboard:renderDash,projects:renderProjects,ongoing:renderOngoing,pipeline:renderPipeline,hospitals:renderHospitals,hcp:renderHCP,templates:()=>renderFiles('templates','Kho template & biểu mẫu','File chuẩn hoá dùng chung — báo giá, hợp đồng khung, form báo cáo.'),credentials:()=>renderFiles('credentials','Credential & Product Deck','Phân loại theo Cộng Đồng Bầu · OTB · IPD8 · Zmoms · NCT, song ngữ VI/EN.'),proposals:()=>renderFiles('proposals','Proposal thư viện','Bộ proposal sẵn sàng để chào nhãn hàng.'),structure:renderStructure};
+ document.getElementById('content').innerHTML=(R[current]||renderDash)();
+ requestAnimationFrame(()=>document.querySelectorAll('.bar-fill,[data-w]').forEach(e=>e.style.width=e.dataset.w));
+}
+
+/* ----- dashboard ----- */
+function renderDash(){
+ const byBrand={};brands.forEach(b=>byBrand[b]=projects.filter(p=>p.brand===b).length);
+ const byRegion={};regions.forEach(r=>byRegion[r]=projects.filter(p=>p.region===r).length);
+ const byAct={};activities.forEach(a=>byAct[a]=projects.filter(p=>p.act.includes(a)).length);
+ const maxB=Math.max(...Object.values(byBrand),1), maxR=Math.max(...Object.values(byRegion),1);
+ const totalHosp=hospitals.length, totalHCP=hcps.length;
+ const totDocs=docs.templates.length+docs.credentials.length+docs.proposals.length;
+ return `
+ <div class="page-head"><div><h1>Dashboard tổng quan</h1><p>Bức tranh toàn cảnh hoạt động Account từ 2025 đến nay.</p></div>
+ <button class="btn primary">＋ Cập nhật dữ liệu</button></div>
+ <div class="grid stats" style="margin-bottom:16px">
+  ${statCard('Dự án đã làm',projects.length,'từ 2025 đến nay','📁',true)}
+  ${statCard('Đang triển khai',ongoing.length,'dự án active','⚙')}
+  ${statCard('Đang mời nhãn hàng',pipeline.length,'deal trong pipeline','📨')}
+  ${statCard('Bệnh viện',totalHosp,'đã & đang triển khai','🏥')}
+ </div>
+ <div class="grid stats" style="margin-bottom:22px">
+  ${statCard('HCP có thể booking',totalHCP,'bác sĩ / chuyên gia','👤')}
+  ${statCard('Proposal thư viện',docs.proposals.length,'sẵn sàng chào NH','💡')}
+  ${statCard('Template & biểu mẫu',docs.templates.length,'file chuẩn hoá','📄')}
+  ${statCard('Credential & Deck',docs.credentials.length,'VI / EN','📊')}
+ </div>
+ <div class="grid charts">
+  <div class="card chart-card">
+    <h3>Dự án theo nhãn hàng</h3>
+    ${brands.map(b=>`<div class="bar-row"><div class="nm">${b}</div><div class="bar-track"><div class="bar-fill" data-w="${byBrand[b]/maxB*100}%" style="width:0;background:${BRAND_COLOR[b]}"></div></div><div class="val">${byBrand[b]}</div></div>`).join('')}
+  </div>
+  <div class="card chart-card">
+    <h3>Theo khu vực</h3>
+    ${regions.map(r=>`<div class="bar-row"><div class="nm">${r}</div><div class="bar-track"><div class="bar-fill" data-w="${byRegion[r]/maxR*100}%" style="width:0"></div></div><div class="val">${byRegion[r]}</div></div>`).join('')}
+  </div>
+ </div>
+ <div class="grid charts" style="margin-top:16px">
+  <div class="card chart-card">
+    <h3>Theo loại hoạt động</h3>
+    ${activities.map(a=>{const v=byAct[a],mx=Math.max(...Object.values(byAct),1);return `<div class="bar-row"><div class="nm">${a}</div><div class="bar-track"><div class="bar-fill" data-w="${v/mx*100}%" style="width:0;background:#8E44AD"></div></div><div class="val">${v}</div></div>`}).join('')}
+  </div>
+  <div class="card chart-card">
+    <h3>Deadline sắp tới</h3>
+    ${ongoing.slice().sort((a,b)=>a.deadline.localeCompare(b.deadline)).map(o=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><span>${o.name}</span><b style="color:var(--brand)">${o.deadline}</b></div>`).join('')}
+  </div>
+ </div>`;
+}
+function statCard(lab,num,sub,ic,accent){return `<div class="card stat ${accent?'accent':''}"><div class="lab"><span class="dot">${ic}</span>${lab}</div><div class="num">${num}</div><div class="sub">${sub}</div></div>`}
+
+/* ----- projects ----- */
+let pF={brand:'',region:'',act:'',year:'',q:''};
+function renderProjects(){
+ return `<div class="page-head"><div><h1>Dự án đã làm</h1><p>Tra cứu toàn bộ dự án từ 2025 · click để xem chi tiết.</p></div><button class="btn primary">＋ Thêm dự án</button></div>
+ <div class="filters">
+  <select onchange="pF.brand=this.value;paintProjects()">${opts(brands)}</select>
+  <select onchange="pF.region=this.value;paintProjects()">${opts(regions)}</select>
+  <select onchange="pF.act=this.value;paintProjects()">${opts(activities)}</select>
+  <select onchange="pF.year=this.value;paintProjects()">${opts(['2025'])}</select>
+  <input class="fsearch" placeholder="Tìm tên dự án…" oninput="pF.q=this.value;paintProjects()">
+  <span class="count-note" id="pcount"></span>
+ </div>
+ <div class="grid proj-grid" id="projgrid"></div>`;
+}
+function paintProjects(){
+ const list=projects.filter(p=>
+  (!pF.brand||p.brand===pF.brand)&&(!pF.region||p.region===pF.region)&&
+  (!pF.act||p.act.includes(pF.act))&&(!pF.year||p.year==pF.year)&&
+  (!pF.q||p.name.toLowerCase().includes(pF.q.toLowerCase())));
+ document.getElementById('pcount').textContent=`${list.length} dự án`;
+ document.getElementById('projgrid').innerHTML=list.map(p=>`
+  <div class="card proj" onclick="openProject(${p.id})">
+    <div class="cover" style="background:${BRAND_COLOR[p.brand]}14;color:${BRAND_COLOR[p.brand]}">📷</div>
+    <div class="body"><h4>${p.name}</h4>
+      <div>${bchip(p.brand)} ${p.act.map(a=>`<span class="chip" style="background:var(--bg);color:var(--muted)">${a}</span>`).join(' ')}</div>
+      <div class="meta"><span>📍 <b>${p.region}</b></span><span>🗓 ${p.time}</span><span>🎯 ${p.result}</span></div>
+    </div>
+  </div>`).join('') || `<div class="card" style="padding:40px;text-align:center;color:var(--muted);grid-column:1/-1">Không có dự án khớp bộ lọc. Thử bỏ bớt điều kiện.</div>`;
+}
+function openProject(id){
+ const p=projects.find(x=>x.id===id);
+ document.getElementById('modal').innerHTML=`
+ <div class="modal-head"><button class="modal-close" onclick="closeModal()">✕</button>
+   <h2>${p.name}</h2>
+   <div class="mh-meta"><span>${p.brand}</span><span>• ${p.client}</span><span>• ${p.region}</span><span>• ${p.time}</span></div>
+ </div>
+ <div class="modal-body">
+  <div>
+    <div class="mb-section"><h4>Sản phẩm & hoạt động</h4><p>${p.prod} — ${p.act.join(', ')}.</p></div>
+    <div class="mb-section"><h4>Kết quả thực tế</h4><p><b style="color:var(--brand)">${p.result}</b></p></div>
+    <div class="mb-section"><h4>Timeline</h4><ul class="mtimeline">${p.tl.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+    <div class="mb-section"><h4>Hình ảnh thực tế</h4><div class="mgallery">${'<div>📷</div>'.repeat(6)}</div></div>
+    ${p.note?`<div class="mb-section"><h4>Ghi chú nội bộ</h4><p>${p.note}</p></div>`:''}
+  </div>
+  <div>
+   <div class="side-box">
+     <div class="kv"><span>CPR</span><b>${p.cpr}</b></div>
+     <div class="kv"><span>KPI</span><b>${p.kpi}</b></div>
+     <div class="kv"><span>Khu vực</span><b>${p.region}</b></div>
+     <div class="kv"><span>Client</span><b>${p.client}</b></div>
+   </div>
+   <div class="mb-section" style="margin-top:16px"><h4>Bệnh viện triển khai</h4><p>${p.hosp.map(h=>`<span class="chip" style="background:var(--brand-tint);color:var(--brand-dark);margin:2px 2px 2px 0">${h}</span>`).join('')}</p></div>
+   <div class="dl-list">
+     <button class="dl-btn">📄 Tải Proposal</button>
+     <button class="dl-btn">📋 Tải Masterplan</button>
+     <button class="dl-btn">🔗 Mở link báo cáo</button>
+   </div>
+  </div>
+ </div>`;
+ document.getElementById('overlay').classList.add('on');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('on')}
+
+/* ----- ongoing ----- */
+function renderOngoing(){
+ return `<div class="page-head"><div><h1>Dự án đang triển khai</h1><p>Theo dõi tiến độ, bệnh viện confirm/pending và việc cần follow up.</p></div><button class="btn primary">＋ Thêm dự án</button></div>
+ <div class="card tbl-wrap"><table>
+  <thead><tr><th>Dự án</th><th>Brand</th><th>Phụ trách</th><th>Giai đoạn</th><th>Tiến độ</th><th>BV confirm / pending</th><th>Việc cần làm</th><th>Deadline</th></tr></thead>
+  <tbody>${ongoing.map(o=>`<tr>
+    <td class="hosp-name">${o.name}</td>
+    <td>${bchip(o.brand)}</td>
+    <td>${o.owner}</td>
+    <td>${o.phase}</td>
+    <td><span class="prog-track"><span class="prog-fill" style="width:${o.pct}%"></span></span> <b style="font-size:12px">${o.pct}%</b></td>
+    <td><span style="color:var(--ok);font-weight:600">${o.confirm.length}✓</span> / <span style="color:var(--warn);font-weight:600">${o.pending.length}⏳</span><div class="mini">${[...o.confirm,...o.pending].join(', ')||'—'}</div></td>
+    <td style="max-width:200px">${o.follow}${o.issue!=='—'?`<div class="mini" style="color:var(--warn)">⚠ ${o.issue}</div>`:''}</td>
+    <td><b style="color:var(--brand)">${o.deadline}</b></td>
+  </tr>`).join('')}</tbody>
+ </table></div>`;
+}
+
+/* ----- pipeline (kanban) ----- */
+function renderPipeline(){
+ const cols=['Chưa gửi','Đã gửi','Follow up','Đàm phán','Won','Lost'];
+ return `<div class="page-head"><div><h1>Đang mời nhãn hàng</h1><p>Pipeline chào proposal — kéo theo trạng thái deal.</p></div><button class="btn primary">＋ Thêm deal</button></div>
+ <div class="kanban">${cols.map(c=>{const items=pipeline.filter(p=>p.status===c);return `
+  <div class="kcol"><h4>${c}<span>${items.length}</span></h4>
+   ${items.map(p=>`<div class="kcard"><b>${p.name}</b>
+     <div style="margin-top:6px">${bchip(p.brand)}</div>
+     <div class="kb-meta"><span>👤 ${p.owner}</span><span>${p.dl!=='—'?'⏰ '+p.dl:''}</span></div>
+   </div>`).join('')||'<div class="mini" style="padding:8px 4px">—</div>'}
+  </div>`}).join('')}</div>`;
+}
+
+/* ----- hospitals ----- */
+let hF={act:'',region:'',status:''};
+function renderHospitals(){
+ return `<div class="page-head"><div><h1>Danh sách bệnh viện</h1><p>Lọc theo loại hoạt động, khu vực, trạng thái hợp tác.</p></div><button class="btn primary">＋ Thêm bệnh viện</button></div>
+ <div class="filters">
+  <select onchange="hF.act=this.value;paintHosp()">${opts(activities)}</select>
+  <select onchange="hF.region=this.value;paintHosp()">${opts(regions)}</select>
+  <select onchange="hF.status=this.value;paintHosp()">${opts(['Đang hợp tác','Tiềm năng'])}</select>
+  <span class="count-note" id="hcount"></span>
+ </div>
+ <div class="card tbl-wrap"><table>
+  <thead><tr><th>Bệnh viện</th><th>Khu vực</th><th>Loại hoạt động</th><th>Traffic</th><th>Mẹ bầu/th</th><th>Trẻ/th</th><th>Brand đã làm</th><th>Trạng thái</th></tr></thead>
+  <tbody id="hosprows"></tbody>
+ </table></div>`;
+}
+function paintHosp(){
+ const list=hospitals.filter(h=>(!hF.act||h.acts.includes(hF.act))&&(!hF.region||h.region===hF.region)&&(!hF.status||h.status===hF.status));
+ document.getElementById('hcount').textContent=`${list.length} bệnh viện`;
+ document.getElementById('hosprows').innerHTML=list.map(h=>`<tr>
+   <td class="hosp-name">${h.name}<div class="mini">${h.contact}</div></td>
+   <td>${h.region}</td>
+   <td>${h.acts.map(a=>`<span class="chip" style="background:var(--bg);color:var(--muted)">${a}</span>`).join(' ')}</td>
+   <td>${h.traffic.toLocaleString()}</td><td>${h.moms.toLocaleString()}</td><td>${h.kids.toLocaleString()}</td>
+   <td>${h.brands.map(b=>bchip(b)).join(' ')}</td>
+   <td>${coopChip(h.status)}</td>
+ </tr>`).join('')||`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Không có kết quả.</td></tr>`;
+}
+
+/* ----- hcp ----- */
+let cF={spec:'',region:'',fmt:''};
+function renderHCP(){
+ const specs=[...new Set(hcps.map(h=>h.spec))];
+ const fmts=['Offline','Online','Livestream','Video','Workshop'];
+ return `<div class="page-head"><div><h1>HCP Booking</h1><p>Bác sĩ & chuyên gia có thể booking cho chương trình.</p></div><button class="btn primary">＋ Thêm HCP</button></div>
+ <div class="filters">
+  <select onchange="cF.spec=this.value;paintHCP()">${opts(specs)}</select>
+  <select onchange="cF.region=this.value;paintHCP()">${opts(regions)}</select>
+  <select onchange="cF.fmt=this.value;paintHCP()">${opts(fmts)}</select>
+  <span class="count-note" id="ccount"></span>
+ </div>
+ <div class="card tbl-wrap"><table>
+  <thead><tr><th>HCP</th><th>Chuyên môn</th><th>Nơi công tác</th><th>Chủ đề</th><th>Hình thức</th><th>Chi phí</th><th>Đánh giá</th></tr></thead>
+  <tbody id="hcprows"></tbody>
+ </table></div>`;
+}
+function paintHCP(){
+ const list=hcps.filter(h=>(!cF.spec||h.spec===cF.spec)&&(!cF.region||h.region===cF.region)&&(!cF.fmt||h.fmt.includes(cF.fmt)));
+ document.getElementById('ccount').textContent=`${list.length} HCP`;
+ document.getElementById('hcprows').innerHTML=list.map(h=>`<tr>
+  <td class="hosp-name">${h.name}</td><td>${h.spec}</td><td>${h.work}<div class="mini">${h.region}</div></td>
+  <td style="max-width:180px">${h.topics}</td>
+  <td>${h.fmt.map(f=>`<span class="chip" style="background:var(--bg);color:var(--muted)">${f}</span>`).join(' ')}</td>
+  <td><b>${h.cost}</b></td><td style="color:var(--warn);white-space:nowrap">${stars(h.rate)}</td>
+ </tr>`).join('')||`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">Không có kết quả.</td></tr>`;
+}
+
+/* ----- file grids ----- */
+function renderFiles(key,title,sub){
+ const items=docs[key];
+ return `<div class="page-head"><div><h1>${title}</h1><p>${sub}</p></div><button class="btn primary">＋ Tải lên file</button></div>
+ <div class="grid file-grid">${items.map(f=>`
+  <div class="card file"><div class="fic" style="background:${f.c}">${f.t}</div>
+   <div style="flex:1"><h4>${f.n}</h4>
+    <div class="fmeta"><span>${f.v}</span>${f.cat?`<span>• ${f.cat}</span>`:''}<span>• ${f.d}</span></div>
+    <button class="dl">⬇ Tải xuống / Mở Drive</button>
+   </div>
+  </div>`).join('')}</div>`;
+}
+
+/* ----- structure ----- */
+let wiki='team';
+function renderStructure(){
+ const pages={
+  team:{t:'Cơ cấu team Account',h:`<h3>Sơ đồ tổ chức</h3><p>CEO → Account Director → 2 Account Lead → 4 Account Executive. Mỗi Lead phụ trách nhóm nhãn hàng riêng.</p>
+   <h3>Vai trò từng bộ phận</h3><p><b>Account Lead:</b> quản lý dự án & quan hệ client. <b>Account Executive:</b> triển khai, báo cáo tuần, follow-up bệnh viện. <b>Support:</b> logistics, in ấn, dữ liệu.</p>
+   <h3>Account phụ trách dự án nào</h3><p>Minh Anh: Anlene, Comfort · Trọng Nhân: Molfix, Johnson · Thu Hà: Lifebuoy, Sure Prevent, Happy Event.</p>`},
+  win:{t:'Quy trình Win job → Nghiệm thu',h:`<div class="flow"><span class="step">Win job</span><span class="arr">→</span><span class="step">Brief & concept</span><span class="arr">→</span><span class="step">Masterplan</span><span class="arr">→</span><span class="step">Chốt bệnh viện</span><span class="arr">→</span><span class="step">Triển khai</span><span class="arr">→</span><span class="step">Báo cáo</span><span class="arr">→</span><span class="step">Nghiệm thu</span></div><p>Mỗi bước có checklist và người chịu trách nhiệm rõ ràng, cập nhật trạng thái ngay trên hệ thống.</p>`},
+  report:{t:'Quy trình báo cáo tuần',h:`<p>Mỗi thứ 6, Account cập nhật tiến độ dự án đang triển khai (tiến độ %, BV confirm/pending, vấn đề, follow-up) bằng <b>Form báo cáo tuần</b> trong kho template. Lead tổng hợp gửi CEO trước 17h.</p>`},
+  file:{t:'Quy trình lưu file & cập nhật dữ liệu',h:`<p>File nặng (proposal, deck, báo cáo) lưu Google Drive theo cấu trúc thư mục Brand → Dự án → Loại file, rồi dán link vào hệ thống. Ảnh thực tế upload trực tiếp. Admin/CEO cập nhật dữ liệu mới qua form hoặc import Excel ở khu vực Admin.</p>`},
+ };
+ const menu=[['team','Cơ cấu team'],['win','Win → Nghiệm thu'],['report','Báo cáo tuần'],['file','Lưu file & dữ liệu']];
+ const p=pages[wiki];
+ return `<div class="page-head"><div><h1>Structure & Quy trình</h1><p>Cơ cấu team và các quy trình vận hành chuẩn.</p></div></div>
+ <div class="grid wiki">
+  <div class="wiki-nav">${menu.map(m=>`<button class="${wiki===m[0]?'active':''}" onclick="wiki='${m[0]}';render()">${m[1]}</button>`).join('')}</div>
+  <div class="card wiki-body"><h2>${p.t}</h2>${p.h}</div>
+ </div>`;
+}
+
+/* ----- global search ----- */
+function globalSearch(q){
+ if(!q)return; q=q.toLowerCase();
+ const hit=(arr,f)=>arr.some(x=>f(x).toLowerCase().includes(q));
+ if(hit(projects,x=>x.name)) go('projects');
+ else if(hit(hospitals,x=>x.name)) go('hospitals');
+ else if(hit(hcps,x=>x.name)) go('hcp');
+}
+
+/* ---------------- init ---------------- */
+buildNav();render();
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+</script>
